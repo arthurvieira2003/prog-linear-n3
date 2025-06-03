@@ -1,0 +1,351 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
+  --primary-color: #38b2ac;
+  --secondary-color: #22543d;
+  --accent-color: #f6e05e;
+  --card-bg: rgba(17, 24, 39, 0.7);
+  --card-border: rgba(56, 178, 172, 0.3);
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  background-image: url("/images/soccer-bg.png");
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded-lg transition-all;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary hover:bg-secondary/90 text-white font-bold py-2 px-4 rounded-lg transition-all;
+  }
+
+  .card {
+    @apply bg-card-bg rounded-xl shadow-lg p-6 hover:shadow-xl transition-all;
+  }
+
+  .team-card {
+    @apply flex flex-col items-center p-4 rounded-lg bg-card-bg/70 hover:bg-card-bg transition-all cursor-pointer;
+  }
+
+  .input-field {
+    @apply bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary;
+  }
+}
+
+.team-badge {
+  transition: transform 0.3s ease;
+}
+
+.team-badge:hover {
+  transform: scale(1.1);
+}
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.navbar {
+  background: linear-gradient(90deg, #16553a 0%, #0f766e 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background-color: rgba(15, 118, 110, 0.3);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+td {
+  padding: 0.75rem;
+}
+
+tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab-navigation {
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.tab-button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.team-card {
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  background-color: rgba(17, 24, 39, 0.7);
+}
+
+.team-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+  border-color: var(--primary-color);
+}
+
+.team-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.team-badge::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+.soccer-ball-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-image: url("/images/soccer-ball-icon.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 0.5rem;
+}
+
+.field-pattern {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(15, 118, 110, 0.1) 0px,
+    rgba(15, 118, 110, 0.1) 20px,
+    rgba(13, 148, 136, 0.15) 20px,
+    rgba(13, 148, 136, 0.15) 40px
+  );
+}
+
+.page-header {
+  background: linear-gradient(135deg, #0f766e 0%, #16553a 100%);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.trophy-icon {
+  color: gold;
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.silver-medal {
+  color: silver;
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.bronze-medal {
+  color: #cd7f32;
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.input-field {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: white;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.3);
+}
+
+.loading-spinner {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.world-cup-bracket {
+  background-color: rgba(8, 8, 30, 0.7);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.match-card {
+  transition: all 0.3s ease;
+}
+
+.match-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.group-table-header {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 64, 175, 0.5) 0%,
+    rgba(37, 99, 235, 0.3) 100%
+  );
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.group-match {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.group-match:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  transform: scale(1.02);
+}
+
+.team-qualified {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.group-marker {
+  background-color: #3b82f6;
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 0.75rem;
+}

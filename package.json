@@ -1,0 +1,43 @@
+{
+  "name": "simulacao-monte-carlo-futebol",
+  "version": "1.0.0",
+  "description": "Simulação de Monte Carlo para prever resultados de campeonatos de futebol",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arthurvieira2003/prog-linear-n3.git"
+  },
+  "keywords": [
+    "monte-carlo",
+    "simulação",
+    "futebol",
+    "brasileirão",
+    "copa-do-mundo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arthurvieira2003/prog-linear-n3/issues"
+  },
+  "homepage": "https://github.com/arthurvieira2003/prog-linear-n3#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "autoprefixer": "^10.4.14",
+    "chart.js": "^3.9.1",
+    "framer-motion": "^10.12.16",
+    "next": "^13.4.7",
+    "postcss": "^8.4.24",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^4.3.1",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.3.2"
+  }
+}

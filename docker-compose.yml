@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  app:
+    image: arthurvieira2003/prog-linear-n3:latest
+    container_name: simulacao-futebol
+    ports:
+      - "2349:2349"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=2349
