@@ -40,7 +40,16 @@ export default function TeamLogo({ team, size = 40 }) {
   }
 
   return (
-    <div style={{ position: "relative", width: size, height: size }}>
+    <div
+      style={{
+        position: "relative",
+        width: size,
+        height: size,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <Image
         src={imageUrl}
         alt={`Escudo do ${team.nome}`}
@@ -49,10 +58,12 @@ export default function TeamLogo({ team, size = 40 }) {
         onError={() => setImgError(true)}
         style={{
           objectFit: "contain",
-          width: "auto",
-          height: "auto",
-          maxWidth: "100%",
-          maxHeight: "100%",
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
         }}
         unoptimized={true}
       />

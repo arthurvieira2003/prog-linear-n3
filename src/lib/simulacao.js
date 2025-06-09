@@ -1097,3 +1097,702 @@ export const simularMultiplasCopas = (times, numSimulacoes) => {
 
   return estatisticas;
 };
+
+export const simularChampionsLeague = (times) => {
+  // Cada time joga 8 partidas, enfrentando 2 times de cada pote
+  const jogos = gerarJogosChampions(times);
+
+  // Simular os jogos da fase de liga
+  const resultadosFaseLiga = simularFaseLigaChampions(jogos);
+
+  // Classificar os times com base nos resultados
+  const classificacao = classificarTimesChampions(resultadosFaseLiga);
+
+  // Os 8 primeiros classificam direto para as oitavas
+  const classificadosOitavas = classificacao.slice(0, 8);
+
+  // Times entre 9º e 24º disputam playoff
+  const classificadosPlayoff = classificacao.slice(8, 24);
+
+  // Os demais são eliminados
+  const eliminados = classificacao.slice(24);
+
+  // Simular os playoffs
+  const resultadosPlayoff = simularPlayoffChampions(classificadosPlayoff);
+
+  // Juntar os classificados diretos com os vencedores dos playoffs
+  const timesOitavas = [
+    ...classificadosOitavas,
+    ...resultadosPlayoff.classificados,
+  ];
+
+  // Simular as fases eliminatórias
+  const resultadosEliminatorias =
+    simularFasesEliminatoriasChampions(timesOitavas);
+
+  return {
+    faseLiga: {
+      jogos,
+      resultados: resultadosFaseLiga,
+      classificacao,
+    },
+    playoff: resultadosPlayoff,
+    eliminados,
+    faseEliminatoria: resultadosEliminatorias,
+    campeao: resultadosEliminatorias.campeao,
+    vice: resultadosEliminatorias.vice,
+  };
+};
+
+export const simularMultiplasChampions = (times, numSimulacoes = 1000) => {
+  const estatisticas = times.map((time) => ({
+    ...time,
+    titulos: 0,
+    vices: 0,
+    semifinais: 0,
+    quartas: 0,
+    oitavas: 0,
+    playoff: 0,
+    top8: 0,
+    eliminadoLiga: 0,
+    jogos: 0,
+    vitorias: 0,
+    empates: 0,
+    derrotas: 0,
+    golsPro: 0,
+    golsContra: 0,
+    pontos: 0,
+  }));
+
+  let simulacaoDetalhada = null;
+
+  for (let i = 0; i < numSimulacoes; i++) {
+    const resultado = simularChampionsLeague(times);
+
+    if (i === 0) {
+      simulacaoDetalhada = resultado;
+    }
+
+    // Atualizar estatísticas do campeão
+    const campeao = estatisticas.find((t) => t.id === resultado.campeao.id);
+    campeao.titulos += 1;
+
+    // Atualizar estatísticas do vice
+    const vice = estatisticas.find((t) => t.id === resultado.vice.id);
+    vice.vices += 1;
+
+    // Atualizar estatísticas de semifinalistas
+    resultado.faseEliminatoria.semifinalistas.forEach((time) => {
+      const timeEstatistica = estatisticas.find((t) => t.id === time.id);
+      timeEstatistica.semifinais += 1;
+    });
+
+    // Atualizar estatísticas de quartas de final
+    resultado.faseEliminatoria.quartasFinalistas.forEach((time) => {
+      const timeEstatistica = estatisticas.find((t) => t.id === time.id);
+      timeEstatistica.quartas += 1;
+    });
+
+    // Atualizar estatísticas de oitavas de final
+    resultado.faseEliminatoria.oitavasFinalistas.forEach((time) => {
+      const timeEstatistica = estatisticas.find((t) => t.id === time.id);
+      timeEstatistica.oitavas += 1;
+    });
+
+    // Atualizar estatísticas de playoff
+    resultado.playoff.times.forEach((time) => {
+      const timeEstatistica = estatisticas.find((t) => t.id === time.id);
+      timeEstatistica.playoff += 1;
+    });
+
+    // Atualizar estatísticas de top 8
+    resultado.faseLiga.classificacao.slice(0, 8).forEach((time) => {
+      const timeEstatistica = estatisticas.find((t) => t.id === time.id);
+      timeEstatistica.top8 += 1;
+    });
+
+    // Atualizar estatísticas de eliminados na fase de liga
+    resultado.eliminados.forEach((time) => {
+      const timeEstatistica = estatisticas.find((t) => t.id === time.id);
+      timeEstatistica.eliminadoLiga += 1;
+    });
+
+    // Atualizar estatísticas gerais de jogos
+    resultado.faseLiga.classificacao.forEach((time) => {
+      const timeEstatistica = estatisticas.find((t) => t.id === time.id);
+      timeEstatistica.jogos += time.jogos;
+      timeEstatistica.vitorias += time.vitorias;
+      timeEstatistica.empates += time.empates;
+      timeEstatistica.derrotas += time.derrotas;
+      timeEstatistica.golsPro += time.golsPro;
+      timeEstatistica.golsContra += time.golsContra;
+      timeEstatistica.pontos += time.pontos;
+    });
+  }
+
+  // Calcular probabilidades
+  estatisticas.forEach((time) => {
+    time.probabilidadeTitulo = (time.titulos / numSimulacoes) * 100;
+    time.probabilidadeVice = (time.vices / numSimulacoes) * 100;
+    time.probabilidadeSemi = (time.semifinais / numSimulacoes) * 100;
+    time.probabilidadeQuartas = (time.quartas / numSimulacoes) * 100;
+    time.probabilidadeOitavas = (time.oitavas / numSimulacoes) * 100;
+    time.probabilidadePlayoff = (time.playoff / numSimulacoes) * 100;
+    time.probabilidadeTop8 = (time.top8 / numSimulacoes) * 100;
+    time.probabilidadeEliminacao = (time.eliminadoLiga / numSimulacoes) * 100;
+
+    // Médias
+    time.mediaJogos = time.jogos / numSimulacoes;
+    time.mediaVitorias = time.vitorias / numSimulacoes;
+    time.mediaEmpates = time.empates / numSimulacoes;
+    time.mediaDerrotas = time.derrotas / numSimulacoes;
+    time.mediaGolsPro = time.golsPro / numSimulacoes;
+    time.mediaGolsContra = time.golsContra / numSimulacoes;
+    time.mediaPontos = time.pontos / numSimulacoes;
+  });
+
+  return {
+    times: estatisticas.sort(
+      (a, b) => b.probabilidadeTitulo - a.probabilidadeTitulo
+    ),
+    simulacaoDetalhada,
+  };
+};
+
+// Função para gerar os jogos da fase de liga da Champions
+function gerarJogosChampions(times) {
+  const potes = [1, 2, 3, 4].map((pote) =>
+    times.filter((time) => time.pote === pote)
+  );
+
+  const jogos = [];
+
+  // Para cada time
+  times.forEach((time) => {
+    const adversarios = [];
+
+    // Selecionar 2 adversários de cada pote
+    potes.forEach((pote) => {
+      // Filtrar times do mesmo pote, excluindo o próprio time
+      const adversariosPote = pote.filter((t) => t.id !== time.id);
+
+      // Embaralhar os times do pote
+      const poteSorteado = [...adversariosPote].sort(() => Math.random() - 0.5);
+
+      // Selecionar 2 adversários
+      let adversariosSelecionados = 0;
+      let i = 0;
+
+      while (adversariosSelecionados < 2 && i < poteSorteado.length) {
+        const adversario = poteSorteado[i];
+
+        // Verificar se o adversário já foi selecionado anteriormente
+        const jogoExistente = jogos.some(
+          (jogo) =>
+            (jogo.mandante.id === time.id &&
+              jogo.visitante.id === adversario.id) ||
+            (jogo.mandante.id === adversario.id &&
+              jogo.visitante.id === time.id)
+        );
+
+        // Verificar se o time já tem 8 jogos
+        const timeTem8Jogos =
+          jogos.filter(
+            (jogo) =>
+              jogo.mandante.id === time.id || jogo.visitante.id === time.id
+          ).length >= 8;
+
+        // Verificar se o adversário já tem 8 jogos
+        const adversarioTem8Jogos =
+          jogos.filter(
+            (jogo) =>
+              jogo.mandante.id === adversario.id ||
+              jogo.visitante.id === adversario.id
+          ).length >= 8;
+
+        if (!jogoExistente && !timeTem8Jogos && !adversarioTem8Jogos) {
+          adversarios.push(adversario);
+          adversariosSelecionados++;
+
+          // Definir quem será mandante (50% de chance para cada)
+          const mandante = Math.random() < 0.5 ? time : adversario;
+          const visitante = mandante === time ? adversario : time;
+
+          jogos.push({
+            mandante,
+            visitante,
+            resultado: null,
+          });
+        }
+
+        i++;
+      }
+    });
+  });
+
+  return jogos;
+}
+
+// Função para simular os jogos da fase de liga
+function simularFaseLigaChampions(jogos) {
+  return jogos.map((jogo) => {
+    const resultado = simularPartidaComGols(jogo.mandante, jogo.visitante);
+    return {
+      ...jogo,
+      resultado,
+      golsMandante: resultado.golsA,
+      golsVisitante: resultado.golsB,
+    };
+  });
+}
+
+// Função para classificar os times após a fase de liga
+function classificarTimesChampions(resultados) {
+  const estatisticas = {};
+
+  // Inicializar estatísticas de todos os times
+  resultados.forEach((jogo) => {
+    const mandanteId = jogo.mandante.id;
+    const visitanteId = jogo.visitante.id;
+
+    if (!estatisticas[mandanteId]) {
+      estatisticas[mandanteId] = {
+        ...jogo.mandante,
+        jogos: 0,
+        vitorias: 0,
+        empates: 0,
+        derrotas: 0,
+        golsPro: 0,
+        golsContra: 0,
+        saldoGols: 0,
+        pontos: 0,
+      };
+    }
+
+    if (!estatisticas[visitanteId]) {
+      estatisticas[visitanteId] = {
+        ...jogo.visitante,
+        jogos: 0,
+        vitorias: 0,
+        empates: 0,
+        derrotas: 0,
+        golsPro: 0,
+        golsContra: 0,
+        saldoGols: 0,
+        pontos: 0,
+      };
+    }
+  });
+
+  // Contabilizar resultados
+  resultados.forEach((jogo) => {
+    const mandante = estatisticas[jogo.mandante.id];
+    const visitante = estatisticas[jogo.visitante.id];
+
+    mandante.jogos += 1;
+    visitante.jogos += 1;
+
+    mandante.golsPro += jogo.golsMandante;
+    mandante.golsContra += jogo.golsVisitante;
+
+    visitante.golsPro += jogo.golsVisitante;
+    visitante.golsContra += jogo.golsMandante;
+
+    if (jogo.golsMandante > jogo.golsVisitante) {
+      // Vitória do mandante
+      mandante.vitorias += 1;
+      mandante.pontos += 3;
+      visitante.derrotas += 1;
+    } else if (jogo.golsMandante < jogo.golsVisitante) {
+      // Vitória do visitante
+      visitante.vitorias += 1;
+      visitante.pontos += 3;
+      mandante.derrotas += 1;
+    } else {
+      // Empate
+      mandante.empates += 1;
+      mandante.pontos += 1;
+      visitante.empates += 1;
+      visitante.pontos += 1;
+    }
+  });
+
+  // Calcular saldo de gols
+  Object.values(estatisticas).forEach((time) => {
+    time.saldoGols = time.golsPro - time.golsContra;
+  });
+
+  // Ordenar por: pontos, saldo de gols, gols pró, vitorias
+  return Object.values(estatisticas).sort((a, b) => {
+    if (a.pontos !== b.pontos) return b.pontos - a.pontos;
+    if (a.saldoGols !== b.saldoGols) return b.saldoGols - a.saldoGols;
+    if (a.golsPro !== b.golsPro) return b.golsPro - a.golsPro;
+    if (a.vitorias !== b.vitorias) return b.vitorias - a.vitorias;
+    return Math.random() - 0.5; // Desempate aleatório caso todos os critérios sejam iguais
+  });
+}
+
+// Função para simular os playoffs
+function simularPlayoffChampions(times) {
+  const timesPrimeiroGrupo = times.slice(0, 8); // 9º-16º
+  const timesSegundoGrupo = times.slice(8, 16); // 17º-24º
+
+  const confrontos = [];
+
+  // Gerar os confrontos: Time do 9º-16º vs Time do 17º-24º
+  for (let i = 0; i < 8; i++) {
+    confrontos.push({
+      id: i + 1,
+      mandante: timesSegundoGrupo[i],
+      visitante: timesPrimeiroGrupo[i],
+      golsMandantaIda: null,
+      golsVisitanteIda: null,
+      golsMandanteVolta: null,
+      golsVisitanteVolta: null,
+      agregado: null,
+      vencedor: null,
+    });
+  }
+
+  // Simular os jogos de ida (mandante é o time pior classificado)
+  confrontos.forEach((confronto) => {
+    const resultadoIda = simularPartidaComGols(
+      confronto.mandante,
+      confronto.visitante
+    );
+    confronto.golsMandanteIda = resultadoIda.golsA;
+    confronto.golsVisitanteIda = resultadoIda.golsB;
+  });
+
+  // Simular os jogos de volta (mandante é o time melhor classificado)
+  confrontos.forEach((confronto) => {
+    const resultadoVolta = simularPartidaComGols(
+      confronto.visitante,
+      confronto.mandante
+    );
+    confronto.golsMandanteVolta = resultadoVolta.golsA;
+    confronto.golsVisitanteVolta = resultadoVolta.golsB;
+
+    // Calcular o placar agregado
+    // Placar agregado correto:
+    // - Para o mandante: seus gols como mandante no jogo de ida + seus gols como visitante no jogo de volta
+    // - Para o visitante: seus gols como visitante no jogo de ida + seus gols como mandante no jogo de volta
+    const golsTotalMandante =
+      confronto.golsMandanteIda + confronto.golsVisitanteVolta;
+    const golsTotalVisitante =
+      confronto.golsVisitanteIda + confronto.golsMandanteVolta;
+
+    // No array agregado, a posição 0 é para o time mandante e a posição 1 é para o time visitante
+    confronto.agregado = [golsTotalMandante, golsTotalVisitante];
+
+    // Determinar o vencedor
+    if (golsTotalMandante > golsTotalVisitante) {
+      confronto.vencedor = confronto.mandante;
+    } else if (golsTotalVisitante > golsTotalMandante) {
+      confronto.vencedor = confronto.visitante;
+    } else {
+      // Em caso de empate no placar agregado, simular pênaltis
+      const penaltis = [
+        Math.floor(Math.random() * 3) + 3, // Entre 3 e 5 gols
+        Math.floor(Math.random() * 3) + 3,
+      ];
+
+      confronto.penaltis = penaltis;
+      confronto.vencedor =
+        penaltis[0] > penaltis[1] ? confronto.mandante : confronto.visitante;
+    }
+  });
+
+  return {
+    times: [...timesPrimeiroGrupo, ...timesSegundoGrupo],
+    confrontos,
+    classificados: confrontos.map((c) => c.vencedor),
+  };
+}
+
+// Função para simular as fases eliminatórias (oitavas, quartas, semi e final)
+function simularFasesEliminatoriasChampions(times) {
+  // Embaralhar os times para definir os confrontos de oitavas
+  const timesSorteados = [...times].sort(() => Math.random() - 0.5);
+
+  // Confrontos de oitavas de final
+  const confrontosOitavas = [];
+  for (let i = 0; i < times.length; i += 2) {
+    confrontosOitavas.push({
+      id: i / 2 + 1,
+      mandante: timesSorteados[i],
+      visitante: timesSorteados[i + 1],
+      resultado: null,
+    });
+  }
+
+  // Simular oitavas de final (ida e volta)
+  const resultadosOitavas = confrontosOitavas.map((confronto) => {
+    // Jogo de ida (mandante joga em casa)
+    const resultadoIda = simularPartidaComGols(
+      confronto.mandante,
+      confronto.visitante
+    );
+    const golsMandanteIda = resultadoIda.golsA; // Gols do mandante no jogo de ida
+    const golsVisitanteIda = resultadoIda.golsB; // Gols do visitante no jogo de ida
+
+    // Jogo de volta (visitante joga em casa)
+    const resultadoVolta = simularPartidaComGols(
+      confronto.visitante,
+      confronto.mandante
+    );
+    const golsMandanteVolta = resultadoVolta.golsA; // Gols do visitante no jogo de volta (agora é mandante)
+    const golsVisitanteVolta = resultadoVolta.golsB; // Gols do mandante no jogo de volta (agora é visitante)
+
+    // Calcular o placar agregado por time:
+    // - Time mandante (jogos de ida e volta): golsMandanteIda + golsVisitanteVolta
+    // - Time visitante (jogos de ida e volta): golsVisitanteIda + golsMandanteVolta
+    const golsTotalMandante = golsMandanteIda + golsVisitanteVolta;
+    const golsTotalVisitante = golsVisitanteIda + golsMandanteVolta;
+
+    let vencedor;
+    let penaltis = null;
+
+    if (golsTotalMandante > golsTotalVisitante) {
+      vencedor = confronto.mandante;
+    } else if (golsTotalVisitante > golsTotalMandante) {
+      vencedor = confronto.visitante;
+    } else {
+      // Em caso de empate no placar agregado, simular pênaltis
+      penaltis = [
+        Math.floor(Math.random() * 3) + 3, // Entre 3 e 5 gols
+        Math.floor(Math.random() * 3) + 3,
+      ];
+
+      vencedor =
+        penaltis[0] > penaltis[1] ? confronto.mandante : confronto.visitante;
+    }
+
+    return {
+      ...confronto,
+      golsMandanteIda,
+      golsVisitanteIda,
+      golsMandanteVolta,
+      golsVisitanteVolta,
+      agregado: [golsTotalMandante, golsTotalVisitante],
+      penaltis,
+      vencedor,
+    };
+  });
+
+  // Lista de times para quartas de final
+  const timesQuartas = resultadosOitavas.map((r) => r.vencedor);
+
+  // Confrontos de quartas de final
+  const confrontosQuartas = [];
+  for (let i = 0; i < timesQuartas.length; i += 2) {
+    confrontosQuartas.push({
+      id: i / 2 + 1,
+      mandante: timesQuartas[i],
+      visitante: timesQuartas[i + 1],
+      resultado: null,
+    });
+  }
+
+  // Simular quartas de final (ida e volta)
+  const resultadosQuartas = confrontosQuartas.map((confronto) => {
+    // Jogo de ida
+    const resultadoIda = simularPartidaComGols(
+      confronto.mandante,
+      confronto.visitante
+    );
+    const golsMandanteIda = resultadoIda.golsA;
+    const golsVisitanteIda = resultadoIda.golsB;
+
+    // Jogo de volta
+    const resultadoVolta = simularPartidaComGols(
+      confronto.visitante,
+      confronto.mandante
+    );
+    const golsMandanteVolta = resultadoVolta.golsA;
+    const golsVisitanteVolta = resultadoVolta.golsB;
+
+    // Placar agregado - corrigido para calcular o total de gols por time
+    const golsTotalMandante = golsMandanteIda + golsVisitanteVolta;
+    const golsTotalVisitante = golsVisitanteIda + golsMandanteVolta;
+
+    let vencedor;
+    let penaltis = null;
+
+    if (golsTotalMandante > golsTotalVisitante) {
+      vencedor = confronto.mandante;
+    } else if (golsTotalVisitante > golsTotalMandante) {
+      vencedor = confronto.visitante;
+    } else {
+      // Em caso de empate no placar agregado, simular pênaltis
+      penaltis = [
+        Math.floor(Math.random() * 3) + 3, // Entre 3 e 5 gols
+        Math.floor(Math.random() * 3) + 3,
+      ];
+
+      vencedor =
+        penaltis[0] > penaltis[1] ? confronto.mandante : confronto.visitante;
+    }
+
+    return {
+      ...confronto,
+      golsMandanteIda,
+      golsVisitanteIda,
+      golsMandanteVolta,
+      golsVisitanteVolta,
+      agregado: [golsTotalMandante, golsTotalVisitante],
+      penaltis,
+      vencedor,
+    };
+  });
+
+  // Lista de times para semifinais
+  const timesSemi = resultadosQuartas.map((r) => r.vencedor);
+
+  // Confrontos de semifinais
+  const confrontosSemi = [
+    {
+      id: 1,
+      mandante: timesSemi[0],
+      visitante: timesSemi[1],
+      resultado: null,
+    },
+    {
+      id: 2,
+      mandante: timesSemi[2],
+      visitante: timesSemi[3],
+      resultado: null,
+    },
+  ];
+
+  // Simular semifinais (ida e volta)
+  const resultadosSemi = confrontosSemi.map((confronto) => {
+    // Jogo de ida
+    const resultadoIda = simularPartidaComGols(
+      confronto.mandante,
+      confronto.visitante
+    );
+    const golsMandanteIda = resultadoIda.golsA;
+    const golsVisitanteIda = resultadoIda.golsB;
+
+    // Jogo de volta
+    const resultadoVolta = simularPartidaComGols(
+      confronto.visitante,
+      confronto.mandante
+    );
+    const golsMandanteVolta = resultadoVolta.golsA;
+    const golsVisitanteVolta = resultadoVolta.golsB;
+
+    // Placar agregado - corrigido para calcular o total de gols por time
+    const golsTotalMandante = golsMandanteIda + golsVisitanteVolta;
+    const golsTotalVisitante = golsVisitanteIda + golsMandanteVolta;
+
+    let vencedor;
+    let perdedor;
+    let penaltis = null;
+
+    if (golsTotalMandante > golsTotalVisitante) {
+      vencedor = confronto.mandante;
+      perdedor = confronto.visitante;
+    } else if (golsTotalVisitante > golsTotalMandante) {
+      vencedor = confronto.visitante;
+      perdedor = confronto.mandante;
+    } else {
+      // Em caso de empate no placar agregado, simular pênaltis
+      penaltis = [
+        Math.floor(Math.random() * 3) + 3, // Entre 3 e 5 gols
+        Math.floor(Math.random() * 3) + 3,
+      ];
+
+      if (penaltis[0] > penaltis[1]) {
+        vencedor = confronto.mandante;
+        perdedor = confronto.visitante;
+      } else {
+        vencedor = confronto.visitante;
+        perdedor = confronto.mandante;
+      }
+    }
+
+    return {
+      ...confronto,
+      golsMandanteIda,
+      golsVisitanteIda,
+      golsMandanteVolta,
+      golsVisitanteVolta,
+      agregado: [golsTotalMandante, golsTotalVisitante],
+      penaltis,
+      vencedor,
+      perdedor,
+    };
+  });
+
+  // Times para a final
+  const timesFinal = resultadosSemi.map((r) => r.vencedor);
+
+  // Final (jogo único)
+  const confrontoFinal = {
+    mandante: timesFinal[0],
+    visitante: timesFinal[1],
+  };
+
+  // Simular a final (jogo único em campo neutro)
+  const resultadoFinal = simularPartidaComGols(
+    confrontoFinal.mandante,
+    confrontoFinal.visitante
+  );
+
+  let vencedor;
+  let vice;
+  let penaltis = null;
+
+  if (resultadoFinal.golsA > resultadoFinal.golsB) {
+    vencedor = confrontoFinal.mandante;
+    vice = confrontoFinal.visitante;
+  } else if (resultadoFinal.golsB > resultadoFinal.golsA) {
+    vencedor = confrontoFinal.visitante;
+    vice = confrontoFinal.mandante;
+  } else {
+    // Em caso de empate, simular pênaltis
+    penaltis = [
+      Math.floor(Math.random() * 3) + 3, // Entre 3 e 5 gols
+      Math.floor(Math.random() * 3) + 3,
+    ];
+
+    if (penaltis[0] > penaltis[1]) {
+      vencedor = confrontoFinal.mandante;
+      vice = confrontoFinal.visitante;
+    } else {
+      vencedor = confrontoFinal.visitante;
+      vice = confrontoFinal.mandante;
+    }
+  }
+
+  return {
+    oitavas: resultadosOitavas,
+    quartas: resultadosQuartas,
+    semifinais: resultadosSemi,
+    final: {
+      ...confrontoFinal,
+      golsMandante: resultadoFinal.golsA,
+      golsVisitante: resultadoFinal.golsB,
+      penaltis,
+      vencedor,
+      perdedor: vice,
+    },
+    oitavasFinalistas: [
+      ...resultadosOitavas.map((r) => r.mandante),
+      ...resultadosOitavas.map((r) => r.visitante),
+    ],
+    quartasFinalistas: [
+      ...resultadosQuartas.map((r) => r.mandante),
+      ...resultadosQuartas.map((r) => r.visitante),
+    ],
+    semifinalistas: [
+      ...resultadosSemi.map((r) => r.mandante),
+      ...resultadosSemi.map((r) => r.visitante),
+    ],
+    finalistas: [confrontoFinal.mandante, confrontoFinal.visitante],
+    campeao: vencedor,
+    vice,
+  };
+}

@@ -14,6 +14,9 @@ import TeamLogo from "@/components/TeamLogo";
 import Navbar from "@/components/Navbar";
 import GroupTable from "@/components/GroupTable";
 import WorldCupBracket from "@/components/WorldCupBracket";
+import MonteCarloExplainer from "@/components/MonteCarloExplainer";
+import MonteCarloVisualizer from "@/components/MonteCarloVisualizer";
+import SimulationStepVisualizer from "@/components/SimulationStepVisualizer";
 
 export default function CopaMundoPage() {
   const [times, setTimes] = useState([...timesCopa]);
@@ -23,6 +26,12 @@ export default function CopaMundoPage() {
   const [showResults, setShowResults] = useState(false);
   const [ultimaCopa, setUltimaCopa] = useState(null);
   const [tabMode, setTabMode] = useState("times");
+  const [currentSimulation, setCurrentSimulation] = useState(0);
+  const [showStepVisualizer, setShowStepVisualizer] = useState(false);
+  const [simulatedTeams, setSimulatedTeams] = useState({
+    home: null,
+    away: null,
+  });
 
   const handleForceChange = (id, novaForca) => {
     setTimes((prevTimes) =>
@@ -82,6 +91,23 @@ export default function CopaMundoPage() {
   const simularCopas = () => {
     setIsLoading(true);
     setShowResults(false);
+    setCurrentSimulation(0);
+
+    // Simulamos um progresso artificial para a visualização
+    const interval = setInterval(() => {
+      setCurrentSimulation((prev) => {
+        const next = prev + Math.floor(Math.random() * 50) + 10;
+        return next >= numSimulacoes ? numSimulacoes : next;
+      });
+    }, 100);
+
+    // Selecionar dois times aleatórios para a visualização passo a passo
+    const timesSorteados = [...times].sort(() => Math.random() - 0.5);
+    setSimulatedTeams({
+      home: timesSorteados[0],
+      away: timesSorteados[1],
+    });
+    setShowStepVisualizer(true);
 
     setTimeout(() => {
       const resultadoSimulacao = simularMultiplasCopas(times, numSimulacoes);
@@ -419,7 +445,8 @@ export default function CopaMundoPage() {
       setIsLoading(false);
       setShowResults(true);
       setTabMode("grupos");
-    }, 100);
+      clearInterval(interval);
+    }, 1500);
   };
 
   const chartData = resultado
@@ -441,7 +468,7 @@ export default function CopaMundoPage() {
     <div className="min-h-screen">
       <Navbar />
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 pb-12">
         <motion.div
           className="page-header"
           initial={{ opacity: 0, y: -20 }}
@@ -518,6 +545,28 @@ export default function CopaMundoPage() {
           </div>
         </div>
 
+        {/* Visualizador de Monte Carlo em tempo real (sempre visível durante a simulação) */}
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <MonteCarloVisualizer
+              isSimulating={isLoading}
+              currentSimulation={currentSimulation}
+              totalSimulations={numSimulacoes}
+              initialTimes={times}
+            />
+
+            <SimulationStepVisualizer
+              isVisible={showStepVisualizer}
+              timeMandante={simulatedTeams.home}
+              timeVisitante={simulatedTeams.away}
+            />
+          </motion.div>
+        )}
+
         <div className="flex justify-center mb-6">
           <div className="tab-navigation">
             <button
@@ -551,6 +600,17 @@ export default function CopaMundoPage() {
                   }`}
                 >
                   Probabilidades
+                </button>
+                <button
+                  onClick={() => {
+                    setTabMode("monte-carlo");
+                    setShowStepVisualizer(true);
+                  }}
+                  className={`tab-button ${
+                    tabMode === "monte-carlo" ? "active" : ""
+                  }`}
+                >
+                  Monte Carlo
                 </button>
               </>
             )}
@@ -631,7 +691,15 @@ export default function CopaMundoPage() {
             <ChampionshipChart
               data={chartData}
               title="Probabilidade de Título (%)"
+              colors={["#4f46e5"]}
               isLoading={isLoading}
+            />
+
+            <MonteCarloExplainer
+              isLoading={isLoading}
+              simulationCount={numSimulacoes}
+              currentSimulation={currentSimulation}
+              results={{ times: resultado }}
             />
 
             <motion.div
@@ -640,130 +708,81 @@ export default function CopaMundoPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="card mt-8 overflow-x-auto"
             >
-              <h3 className="text-xl font-bold mb-4">
-                Probabilidades Detalhadas
-              </h3>
-              <table className="min-w-full divide-y divide-gray-700">
-                <thead>
-                  <tr>
-                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Posição
-                    </th>
-                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Seleção
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Títulos
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      %
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Vice
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      %
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Semifinal
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      %
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Quartas
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      %
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      Oitavas
-                    </th>
-                    <th className="py-3 px-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      %
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-800">
-                  {resultado.map((time, index) => (
-                    <tr
-                      key={time.id}
-                      className={index % 2 === 0 ? "bg-gray-800/30" : ""}
-                    >
-                      <td className="py-2 px-4 whitespace-nowrap">
-                        <div className="text-sm font-medium">{index + 1}</div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-8 w-8 relative">
-                            <TeamLogo team={time} size={32} />
-                          </div>
-                          <div className="ml-3">
-                            <div className="text-sm font-medium">
-                              {time.nome}
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              Grupo {time.grupo}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm font-semibold">
-                          {time.titulos}
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm font-bold text-yellow-400">
-                          {time.probabilidadeTitulo.toFixed(1)}%
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm font-semibold">
-                          {time.vices}
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm font-medium text-gray-300">
-                          {time.probabilidadeVice.toFixed(1)}%
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm font-semibold">
-                          {time.semifinais}
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm text-gray-300">
-                          {time.probabilidadeSemi.toFixed(1)}%
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm font-semibold">
-                          {time.quartas}
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm text-gray-300">
-                          {time.probabilidadeQuartas.toFixed(1)}%
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm font-semibold">
-                          {time.oitavas}
-                        </div>
-                      </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-center">
-                        <div className="text-sm text-gray-300">
-                          {time.probabilidadeOitavas.toFixed(1)}%
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {/* ... existing code for the table ... */}
             </motion.div>
           </motion.div>
+        )}
+
+        {tabMode === "monte-carlo" && (
+          <div className="grid grid-cols-1 gap-8 mb-8">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="card mb-6">
+                <h3 className="text-xl font-bold mb-4">
+                  Visualização do Método Monte Carlo
+                </h3>
+                <p className="mb-4">
+                  Esta visualização mostra como o método Monte Carlo é aplicado
+                  para simular os resultados da Copa do Mundo. Cada simulação
+                  gera resultados aleatórios baseados nas forças das seleções,
+                  permitindo calcular probabilidades reais após milhares de
+                  iterações.
+                </p>
+
+                <div className="bg-blue-900/20 p-4 rounded-lg mb-4">
+                  <h4 className="font-semibold mb-2">Como funciona:</h4>
+                  <ol className="list-decimal list-inside space-y-2">
+                    <li>
+                      <strong>Simulação de partidas</strong>: Cada partida é
+                      simulada usando probabilidades baseadas na força das
+                      seleções
+                    </li>
+                    <li>
+                      <strong>Simulação completa</strong>: Todo o torneio é
+                      simulado do início ao fim, incluindo fase de grupos e
+                      mata-mata
+                    </li>
+                    <li>
+                      <strong>Repetição</strong>: O processo é repetido milhares
+                      de vezes (Monte Carlo)
+                    </li>
+                    <li>
+                      <strong>Estatísticas</strong>: Os resultados são agregados
+                      para calcular probabilidades de classificação, título,
+                      etc.
+                    </li>
+                  </ol>
+                </div>
+
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => {
+                      const timesSorteados = [...times].sort(
+                        () => Math.random() - 0.5
+                      );
+                      setSimulatedTeams({
+                        home: timesSorteados[0],
+                        away: timesSorteados[1],
+                      });
+                      setShowStepVisualizer(true);
+                    }}
+                    className="btn-primary"
+                  >
+                    Simular Nova Partida
+                  </button>
+                </div>
+              </div>
+
+              <SimulationStepVisualizer
+                isVisible={showStepVisualizer}
+                timeMandante={simulatedTeams.home}
+                timeVisitante={simulatedTeams.away}
+              />
+            </motion.div>
+          </div>
         )}
       </div>
     </div>

@@ -41,42 +41,38 @@ export default function Home() {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12"
           variants={container}
           initial="hidden"
           animate="show"
         >
           <motion.div variants={item}>
             <Link href="/brasileirao">
-              <div className="card h-full transform transition duration-300 hover:scale-105 hover:shadow-xl border-2 border-transparent hover:border-green-500">
+              <div className="card h-full transform transition duration-300 hover:scale-105 hover:shadow-xl border-2 border-transparent hover:border-green-500 bg-gradient-to-b from-green-900/30 to-transparent">
                 <div className="relative z-10">
                   <div className="flex justify-center mb-6">
-                    <div className="w-20 h-20 relative bg-gradient-to-br from-green-500 to-yellow-400 rounded-full flex items-center justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        className="w-12 h-12 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                        <path d="M2 12h20" />
-                      </svg>
+                    <div className="w-20 h-20 relative bg-gradient-to-br from-green-500 to-yellow-400 rounded-full flex items-center justify-center p-4">
+                      <img
+                        src="https://brandlogos.net/wp-content/uploads/2023/08/brasileiro_serie_a-logo_brandlogos.net_nnva7-512x629.png"
+                        alt="Brasileirão"
+                        className="w-16 h-12 object-contain"
+                      />
                     </div>
                   </div>
-                  <h2 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+                  <h2 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-green-400 to-yellow-400 bg-clip-text text-transparent">
                     Brasileirão 2025
                   </h2>
                   <p className="text-gray-300 mb-6 text-center">
-                    Simulação do próximo campeonato brasileiro e probabilidades
-                    de cada time ser campeão, ir para Libertadores ou ser
-                    rebaixado.
+                    Simulação da Série A e probabilidades de cada time ser
+                    campeão, ir para Libertadores ou ser rebaixado.
                   </p>
-                  <div className="field-pattern h-16 rounded-lg mb-6 relative overflow-hidden">
+                  <div
+                    className="field-pattern h-16 rounded-lg mb-6 relative overflow-hidden"
+                    style={{
+                      background:
+                        "linear-gradient(to right, rgba(0, 105, 65, 0.3), rgba(255, 204, 0, 0.3))",
+                    }}
+                  >
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-white font-bold text-lg">
                         20 Times
@@ -84,7 +80,9 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="flex justify-center">
-                    <button className="btn-primary">Simular Brasileirão</button>
+                    <button className="btn-primary bg-gradient-to-r from-green-500 to-yellow-500">
+                      Simular Brasileirão
+                    </button>
                   </div>
                 </div>
               </div>
@@ -93,32 +91,31 @@ export default function Home() {
 
           <motion.div variants={item}>
             <Link href="/copa-do-mundo">
-              <div className="card h-full transform transition duration-300 hover:scale-105 hover:shadow-xl border-2 border-transparent hover:border-blue-500">
+              <div className="card h-full transform transition duration-300 hover:scale-105 hover:shadow-xl border-2 border-transparent hover:border-[#9a1439] bg-gradient-to-b from-[#2f0815]/40 to-transparent">
                 <div className="relative z-10">
                   <div className="flex justify-center mb-6">
-                    <div className="w-20 h-20 relative bg-gradient-to-br from-blue-500 to-yellow-400 rounded-full flex items-center justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        className="w-12 h-12 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                      </svg>
+                    <div className="w-20 h-20 relative bg-gradient-to-br from-[#9a1439] to-[#2f0815] rounded-full flex items-center justify-center">
+                      <img
+                        src="https://vetores.org/d/fifa-world-cup-qatar-2022.svg"
+                        alt="Copa do Mundo"
+                        className="w-14 h-14 object-contain"
+                      />
                     </div>
                   </div>
-                  <h2 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                  <h2 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-[#9a1439] to-white bg-clip-text text-transparent">
                     Copa do Mundo 2022
                   </h2>
                   <p className="text-gray-300 mb-6 text-center">
                     Desempenho das seleções na fase de grupos e mata-mata com
                     visualização do chaveamento.
                   </p>
-                  <div className="field-pattern h-16 rounded-lg mb-6 relative overflow-hidden">
+                  <div
+                    className="field-pattern h-16 rounded-lg mb-6 relative overflow-hidden"
+                    style={{
+                      background:
+                        "linear-gradient(to right, rgba(154, 20, 57, 0.3), rgba(47, 8, 21, 0.3))",
+                    }}
+                  >
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-white font-bold text-lg">
                         32 Seleções
@@ -126,8 +123,51 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="flex justify-center">
-                    <button className="btn-primary">
+                    <button className="btn-primary bg-gradient-to-r from-[#9a1439] to-[#2f0815]">
                       Simular Copa do Mundo
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+
+          <motion.div variants={item}>
+            <Link href="/champions-league">
+              <div className="card h-full transform transition duration-300 hover:scale-105 hover:shadow-xl border-2 border-transparent hover:border-purple-500 bg-gradient-to-b from-indigo-900/30 to-transparent">
+                <div className="relative z-10">
+                  <div className="flex justify-center mb-6">
+                    <div className="w-20 h-20 relative bg-gradient-to-br from-blue-800 to-purple-700 rounded-full flex items-center justify-center">
+                      <img
+                        src="/images/champions-logo.svg"
+                        alt="Champions League"
+                        className="w-14 h-14 object-contain"
+                      />
+                    </div>
+                  </div>
+                  <h2 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                    Champions League 2024/25
+                  </h2>
+                  <p className="text-gray-300 mb-6 text-center">
+                    Novo formato com fase de liga única e 36 times, playoffs e
+                    fase eliminatória com jogos de ida e volta.
+                  </p>
+                  <div
+                    className="field-pattern h-16 rounded-lg mb-6 relative overflow-hidden"
+                    style={{
+                      background:
+                        "linear-gradient(to right, rgba(12, 33, 128, 0.3), rgba(89, 40, 145, 0.3))",
+                    }}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-white font-bold text-lg">
+                        36 Times
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex justify-center">
+                    <button className="btn-primary bg-gradient-to-r from-blue-600 to-purple-600">
+                      Simular Champions League
                     </button>
                   </div>
                 </div>

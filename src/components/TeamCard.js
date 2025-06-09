@@ -12,7 +12,7 @@ export default function TeamCard({
   onForceChange = () => {},
   animationDelay = 0,
 }) {
-  const setHovering = useState(false);
+  const [isHovering, setHovering] = useState(false);
 
   const gradientStyle = {
     background: `linear-gradient(135deg, ${time.cor} 0%, ${
@@ -34,10 +34,12 @@ export default function TeamCard({
 
       <div className="relative z-10 flex flex-col items-center">
         <div className="mb-3 w-20 h-20 flex items-center justify-center">
-          <TeamLogo team={time} size={80} />
+          <div className="flex items-center justify-center">
+            <TeamLogo team={time} size={80} />
+          </div>
         </div>
 
-        <h3 className="text-lg font-bold mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+        <h3 className="text-lg font-bold mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent text-center">
           {time.nome}
         </h3>
 

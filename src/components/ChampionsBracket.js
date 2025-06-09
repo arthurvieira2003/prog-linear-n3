@@ -1,115 +1,187 @@
-"use client";
-
-import React from "react";
 import { motion } from "framer-motion";
 import TeamLogo from "./TeamLogo";
 
-export default function WorldCupBracket({ chaveamento }) {
-  if (!chaveamento) {
-    return (
-      <div className="card p-6 text-center text-gray-400">
-        Nenhum chaveamento disponível
-      </div>
-    );
-  }
+export default function ChampionsBracket({ chaveamento }) {
+  if (!chaveamento) return null;
 
-  const { oitavas, quartas, semifinais, final, campeao } = chaveamento;
+  const { oitavas, quartas, semifinais, final } = chaveamento;
 
   const renderPartida = (partida, fase) => {
-    if (!partida || !partida.timeA || !partida.timeB) return null;
+    if (!partida) return null;
 
+    const isIda = partida.golsMandanteIda !== undefined;
     const temPenaltis =
-      partida.penaltisA !== undefined && partida.penaltisB !== undefined;
-    const resultadoA = partida.golsA;
-    const resultadoB = partida.golsB;
-    const vencedor = partida.vencedor;
+      partida.penaltis !== null && partida.penaltis !== undefined;
 
-    const timeAClasses = `col-span-4 flex items-center ${
-      vencedor && vencedor.id === partida.timeA.id
-        ? "font-bold text-green-400"
-        : ""
-    }`;
-    const timeBClasses = `col-span-4 flex items-center ${
-      vencedor && vencedor.id === partida.timeB.id
-        ? "font-bold text-green-400"
+    // Classes para mandante
+    const mandanteClasses = `flex items-center ${
+      partida.vencedor?.id === partida.mandante.id
+        ? "text-green-400 font-semibold"
         : ""
     }`;
 
-    const timeAStyle = {
-      background: `linear-gradient(135deg, ${
-        partida.timeA.cor || "#1e293b"
-      } 0%, ${
-        partida.timeA.corSecundaria || partida.timeA.cor || "#1e293b"
-      } 100%)`,
-      opacity: 0.2,
-    };
+    // Classes para visitante
+    const visitanteClasses = `flex items-center ${
+      partida.vencedor?.id === partida.visitante.id
+        ? "text-green-400 font-semibold"
+        : ""
+    }`;
 
-    const timeBStyle = {
-      background: `linear-gradient(135deg, ${
-        partida.timeB.cor || "#1e293b"
-      } 0%, ${
-        partida.timeB.corSecundaria || partida.timeB.cor || "#1e293b"
-      } 100%)`,
-      opacity: 0.2,
-    };
-
-    // Função para limitar nomes muito longos
-    const limitarNome = (nome) => {
-      if (nome.length > 12) {
-        return nome.substring(0, 10) + "...";
-      }
-      return nome;
-    };
-
-    return (
-      <div
-        className={`match-card p-3 rounded-lg shadow-md ${fase} relative overflow-hidden backdrop-blur-sm w-[290px] border border-gray-700 bg-gray-800`}
-      >
-        <div className="absolute inset-0 top-0 h-1/2" style={timeAStyle}></div>
-        <div
-          className="absolute inset-0 top-1/2 h-1/2"
-          style={timeBStyle}
-        ></div>
-
-        <div className="relative z-1">
+    // Se for jogo único (final)
+    if (!isIda) {
+      return (
+        <div className="match-card p-3 rounded-lg border border-gray-700 bg-gray-800 shadow-md w-[270px]">
           <div className="grid grid-cols-12 items-center mb-2">
-            <div className={timeAClasses}>
+            <div className={`col-span-5 ${mandanteClasses}`}>
               <div className="flex items-center">
-                <div className="w-6 h-6 relative mr-2 flex-shrink-0">
-                  <TeamLogo team={partida.timeA} size={24} />
+                <div className="w-6 h-6 relative mr-2">
+                  <TeamLogo team={partida.mandante} size={24} />
                 </div>
-                <span className="text-sm truncate max-w-[70px] font-medium">
-                  {limitarNome(partida.timeA.nome)}
+                <span className="text-sm truncate max-w-[100px] font-medium">
+                  {partida.mandante.nome}
                 </span>
               </div>
             </div>
 
-            <div className="col-span-4 flex justify-center font-bold">
-              <span className="text-sm">{resultadoA}</span>
+            <div className="col-span-2 flex justify-center font-bold">
+              <span className="text-sm">{partida.golsMandante}</span>
               <span className="mx-1">-</span>
-              <span className="text-sm">{resultadoB}</span>
+              <span className="text-sm">{partida.golsVisitante}</span>
               {temPenaltis && (
                 <span className="text-xs text-gray-400 ml-1">
-                  ({partida.penaltisA}-{partida.penaltisB})
+                  ({partida.penaltis[0]}-{partida.penaltis[1]})
                 </span>
               )}
             </div>
 
-            <div className={`${timeBClasses} justify-end`}>
+            <div className={`col-span-5 ${visitanteClasses} flex justify-end`}>
               <div className="flex items-center">
-                <span className="text-sm truncate max-w-[70px] font-medium text-right">
-                  {limitarNome(partida.timeB.nome)}
+                <span className="text-sm truncate max-w-[100px] font-medium">
+                  {partida.visitante.nome}
                 </span>
-                <div className="w-6 h-6 relative ml-2 flex-shrink-0">
-                  <TeamLogo team={partida.timeB} size={24} />
+                <div className="w-6 h-6 relative ml-2">
+                  <TeamLogo team={partida.visitante} size={24} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Para jogos de ida e volta
+    return (
+      <div className="match-card p-3 rounded-lg border border-gray-700 bg-gray-800 shadow-md w-[270px]">
+        {/* Jogo de ida */}
+        <div className="mb-3">
+          <div className="text-xs text-gray-400 mb-1 text-center">
+            Jogo de ida
+          </div>
+          <div className="grid grid-cols-12 items-center">
+            <div className="col-span-5 flex items-center">
+              <div className="w-5 h-5 relative mr-1 flex-shrink-0">
+                <TeamLogo team={partida.mandante} size={20} />
+              </div>
+              <span className="text-xs truncate max-w-[80px]">
+                {partida.mandante.nome}
+              </span>
+            </div>
+
+            <div className="col-span-2 flex justify-center font-bold">
+              <span className="text-sm">{partida.golsMandanteIda}</span>
+              <span className="mx-1">-</span>
+              <span className="text-sm">{partida.golsVisitanteIda}</span>
+            </div>
+
+            <div className="col-span-5 flex items-center justify-end">
+              <span className="text-xs truncate max-w-[80px] text-right">
+                {partida.visitante.nome}
+              </span>
+              <div className="w-5 h-5 relative ml-1 flex-shrink-0">
+                <TeamLogo team={partida.visitante} size={20} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Jogo de volta */}
+        <div className="mb-3">
+          <div className="text-xs text-gray-400 mb-1 text-center">
+            Jogo de volta
+          </div>
+          <div className="grid grid-cols-12 items-center">
+            <div className="col-span-5 flex items-center">
+              <div className="w-5 h-5 relative mr-1 flex-shrink-0">
+                <TeamLogo team={partida.visitante} size={20} />
+              </div>
+              <span className="text-xs truncate max-w-[80px]">
+                {partida.visitante.nome}
+              </span>
+            </div>
+
+            <div className="col-span-2 flex justify-center font-bold">
+              <span className="text-sm">{partida.golsMandanteVolta}</span>
+              <span className="mx-1">-</span>
+              <span className="text-sm">{partida.golsVisitanteVolta}</span>
+            </div>
+
+            <div className="col-span-5 flex items-center justify-end">
+              <span className="text-xs truncate max-w-[80px] text-right">
+                {partida.mandante.nome}
+              </span>
+              <div className="w-5 h-5 relative ml-1 flex-shrink-0">
+                <TeamLogo team={partida.mandante} size={20} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Agregado */}
+        <div className="text-center px-2 py-1 rounded-md bg-gray-900 border border-gray-700">
+          <div className="grid grid-cols-12 items-center">
+            <div className="col-span-5 flex items-center justify-end">
+              <span className="text-xs text-gray-400 mr-1">Agregado:</span>
+              <div className="flex items-center">
+                <div className="w-4 h-4 relative mr-1 flex-shrink-0">
+                  <TeamLogo team={partida.mandante} size={16} />
+                </div>
+                <span
+                  className={
+                    partida.vencedor?.id === partida.mandante.id
+                      ? "text-green-400 font-bold"
+                      : ""
+                  }
+                >
+                  {partida.golsMandanteIda + partida.golsVisitanteVolta}
+                </span>
+              </div>
+            </div>
+
+            <div className="col-span-2 flex justify-center items-center">
+              <span className="mx-1 text-xs">-</span>
+            </div>
+
+            <div className="col-span-5 flex items-center">
+              <div className="flex items-center">
+                <span
+                  className={
+                    partida.vencedor?.id === partida.visitante.id
+                      ? "text-green-400 font-bold"
+                      : ""
+                  }
+                >
+                  {partida.golsVisitanteIda + partida.golsMandanteVolta}
+                </span>
+                <div className="w-4 h-4 relative ml-1 flex-shrink-0">
+                  <TeamLogo team={partida.visitante} size={16} />
                 </div>
               </div>
             </div>
           </div>
 
           {temPenaltis && (
-            <div className="text-xs text-center text-gray-400 mt-1">
-              Decisão por pênaltis
+            <div className="text-xs text-gray-400 mt-1">
+              Pênaltis: {partida.penaltis[0]}-{partida.penaltis[1]}
             </div>
           )}
         </div>
@@ -117,6 +189,7 @@ export default function WorldCupBracket({ chaveamento }) {
     );
   };
 
+  // Retornar o bracket com o estilo exato da imagem
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -158,7 +231,7 @@ export default function WorldCupBracket({ chaveamento }) {
               const topPosition = index * 180;
               return (
                 <div
-                  key={`oitavas-${index}`}
+                  key={`oitavas-${partida.id}`}
                   className="absolute"
                   style={{
                     left: "0px",
@@ -177,7 +250,7 @@ export default function WorldCupBracket({ chaveamento }) {
               const topPosition = index * 360 + 90;
               return (
                 <div
-                  key={`quartas-${index}`}
+                  key={`quartas-${partida.id}`}
                   className="absolute"
                   style={{
                     left: "320px",
@@ -196,7 +269,7 @@ export default function WorldCupBracket({ chaveamento }) {
               const topPosition = index * 720 + 270;
               return (
                 <div
-                  key={`semifinal-${index}`}
+                  key={`semifinal-${partida.id}`}
                   className="absolute"
                   style={{
                     left: "640px",
@@ -239,9 +312,9 @@ export default function WorldCupBracket({ chaveamento }) {
                     <div
                       className="absolute border-t-2 border-gray-600"
                       style={{
-                        left: "290px",
+                        left: "270px",
                         top: `${startY1}px`,
-                        width: "15px",
+                        width: "30px",
                       }}
                     ></div>
 
@@ -249,9 +322,9 @@ export default function WorldCupBracket({ chaveamento }) {
                     <div
                       className="absolute border-t-2 border-gray-600"
                       style={{
-                        left: "290px",
+                        left: "270px",
                         top: `${startY2}px`,
-                        width: "15px",
+                        width: "30px",
                       }}
                     ></div>
 
@@ -259,7 +332,7 @@ export default function WorldCupBracket({ chaveamento }) {
                     <div
                       className="absolute border-l-2 border-gray-600"
                       style={{
-                        left: "305px",
+                        left: "300px",
                         top: `${startY1}px`,
                         height: `${startY2 - startY1}px`,
                       }}
@@ -269,9 +342,9 @@ export default function WorldCupBracket({ chaveamento }) {
                     <div
                       className="absolute border-t-2 border-gray-600"
                       style={{
-                        left: "305px",
+                        left: "300px",
                         top: `${midY}px`,
-                        width: "15px",
+                        width: "20px",
                       }}
                     ></div>
                   </div>
@@ -298,9 +371,9 @@ export default function WorldCupBracket({ chaveamento }) {
                     <div
                       className="absolute border-t-2 border-gray-600"
                       style={{
-                        left: "610px",
+                        left: "590px",
                         top: `${startY1}px`,
-                        width: "15px",
+                        width: "30px",
                       }}
                     ></div>
 
@@ -308,9 +381,9 @@ export default function WorldCupBracket({ chaveamento }) {
                     <div
                       className="absolute border-t-2 border-gray-600"
                       style={{
-                        left: "610px",
+                        left: "590px",
                         top: `${startY2}px`,
-                        width: "15px",
+                        width: "30px",
                       }}
                     ></div>
 
@@ -318,7 +391,7 @@ export default function WorldCupBracket({ chaveamento }) {
                     <div
                       className="absolute border-l-2 border-gray-600"
                       style={{
-                        left: "625px",
+                        left: "620px",
                         top: `${startY1}px`,
                         height: `${startY2 - startY1}px`,
                       }}
@@ -328,9 +401,9 @@ export default function WorldCupBracket({ chaveamento }) {
                     <div
                       className="absolute border-t-2 border-gray-600"
                       style={{
-                        left: "625px",
+                        left: "620px",
                         top: `${midY}px`,
-                        width: "15px",
+                        width: "20px",
                       }}
                     ></div>
                   </div>
@@ -346,9 +419,9 @@ export default function WorldCupBracket({ chaveamento }) {
               <div
                 className="absolute border-t-2 border-gray-600"
                 style={{
-                  left: "930px",
+                  left: "910px",
                   top: "330px",
-                  width: "15px",
+                  width: "30px",
                 }}
               ></div>
 
@@ -356,9 +429,9 @@ export default function WorldCupBracket({ chaveamento }) {
               <div
                 className="absolute border-t-2 border-gray-600"
                 style={{
-                  left: "930px",
+                  left: "910px",
                   top: "990px",
-                  width: "15px",
+                  width: "30px",
                 }}
               ></div>
 
@@ -366,7 +439,7 @@ export default function WorldCupBracket({ chaveamento }) {
               <div
                 className="absolute border-l-2 border-gray-600"
                 style={{
-                  left: "945px",
+                  left: "940px",
                   top: "330px",
                   height: "660px",
                 }}
@@ -376,16 +449,16 @@ export default function WorldCupBracket({ chaveamento }) {
               <div
                 className="absolute border-t-2 border-gray-600"
                 style={{
-                  left: "945px",
+                  left: "940px",
                   top: "690px",
-                  width: "15px",
+                  width: "20px",
                 }}
               ></div>
             </div>
           )}
 
           {/* Campeão */}
-          {campeao && (
+          {final && final.vencedor && (
             <div
               className="absolute flex flex-col items-center"
               style={{
@@ -398,10 +471,10 @@ export default function WorldCupBracket({ chaveamento }) {
                   CAMPEÃO
                 </div>
                 <div className="w-16 h-16 mx-auto relative mb-2">
-                  <TeamLogo team={campeao} size={64} />
+                  <TeamLogo team={final.vencedor} size={64} />
                 </div>
                 <div className="text-lg font-bold text-yellow-400">
-                  {campeao.nome}
+                  {final.vencedor.nome}
                 </div>
               </div>
             </div>

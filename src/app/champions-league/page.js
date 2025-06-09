@@ -1,26 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import TeamCard from "@/components/TeamCard";
-import ChampionshipChart from "@/components/ChampionshipChart";
-import { timesBrasileirao } from "@/lib/times-brasileirao";
-import { simularMultiplosBrasileiroes } from "@/lib/simulacao";
-import TeamLogo from "@/components/TeamLogo";
 import Navbar from "@/components/Navbar";
-import MatchTable from "@/components/MatchTable";
-import LeagueTable from "@/components/LeagueTable";
-import TopScorers from "@/components/TopScorers";
+import TeamCard from "@/components/TeamCard";
+import TeamLogo from "@/components/TeamLogo";
+import ChampionshipChart from "@/components/ChampionshipChart";
+import ChampionsLigaTable from "@/components/ChampionsLigaTable";
+import ChampionsPlayoffBracket from "@/components/ChampionsPlayoffBracket";
+import ChampionsBracket from "@/components/ChampionsBracket";
+import { timesChampions } from "@/lib/times-champions";
+import { simularMultiplasChampions } from "@/lib/simulacao";
 import MonteCarloExplainer from "@/components/MonteCarloExplainer";
 import MonteCarloVisualizer from "@/components/MonteCarloVisualizer";
 import SimulationStepVisualizer from "@/components/SimulationStepVisualizer";
 
-export default function BrasileiraoPage() {
-  const [times, setTimes] = useState([...timesBrasileirao]);
+export default function ChampionsLeaguePage() {
+  const [times, setTimes] = useState(
+    [...timesChampions].sort((a, b) => a.nome.localeCompare(b.nome))
+  );
   const [resultado, setResultado] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [numSimulacoes, setNumSimulacoes] = useState(1000);
-  const [showTable, setShowTable] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const [tabMode, setTabMode] = useState("probabilidades");
   const [currentSimulation, setCurrentSimulation] = useState(0);
   const [showStepVisualizer, setShowStepVisualizer] = useState(false);
@@ -37,25 +39,29 @@ export default function BrasileiraoPage() {
     );
 
     setResultado(null);
+    setShowResults(false);
   };
 
   const randomizarForcas = () => {
     setTimes((prevTimes) =>
-      prevTimes.map((time) => ({
-        ...time,
-        ataque: Math.floor(Math.random() * 30) + 70,
-        meio: Math.floor(Math.random() * 30) + 70,
-        defesa: Math.floor(Math.random() * 30) + 70,
-        forca: Math.floor(Math.random() * 30) + 70,
-      }))
+      prevTimes
+        .map((time) => ({
+          ...time,
+          ataque: Math.floor(Math.random() * 30) + 70,
+          meio: Math.floor(Math.random() * 30) + 70,
+          defesa: Math.floor(Math.random() * 30) + 70,
+          forca: Math.floor(Math.random() * 30) + 70,
+        }))
+        .sort((a, b) => a.nome.localeCompare(b.nome))
     );
 
     setResultado(null);
+    setShowResults(false);
   };
 
   const simularCampeonato = () => {
     setIsLoading(true);
-    setShowTable(false);
+    setShowResults(false);
     setCurrentSimulation(0);
 
     // Simulamos um progresso artificial para a visualização
@@ -75,13 +81,13 @@ export default function BrasileiraoPage() {
     setShowStepVisualizer(true);
 
     setTimeout(() => {
-      const resultadoSimulacao = simularMultiplosBrasileiroes(
+      const resultadoSimulacao = simularMultiplasChampions(
         times,
         numSimulacoes
       );
       setResultado(resultadoSimulacao);
       setIsLoading(false);
-      setShowTable(true);
+      setShowResults(true);
       clearInterval(interval);
     }, 1500);
   };
@@ -108,8 +114,8 @@ export default function BrasileiraoPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">
-            Brasileirão Série A 2025
+          <h1 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+            UEFA Champions League 2024/25
           </h1>
         </motion.div>
 
@@ -171,7 +177,7 @@ export default function BrasileiraoPage() {
                     Simulando...
                   </span>
                 ) : (
-                  "Simular Campeonato"
+                  "Simular Champions League"
                 )}
               </button>
             </div>
@@ -201,8 +207,8 @@ export default function BrasileiraoPage() {
         )}
 
         <div className="mb-10">
-          <h2 className="text-2xl font-bold mb-4">Times do Brasileirão</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <h2 className="text-2xl font-bold mb-4">Times da Champions League</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {times.map((time, index) => (
               <TeamCard
                 key={time.id}
@@ -216,7 +222,7 @@ export default function BrasileiraoPage() {
           </div>
         </div>
 
-        {resultado && (
+        {resultado && showResults && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -236,28 +242,28 @@ export default function BrasileiraoPage() {
                   Probabilidades
                 </button>
                 <button
-                  onClick={() => setTabMode("jogos")}
+                  onClick={() => setTabMode("fase-liga")}
                   className={`tab-button ${
-                    tabMode === "jogos" ? "active" : ""
+                    tabMode === "fase-liga" ? "active" : ""
                   }`}
                 >
-                  Jogos
+                  Fase de Liga
                 </button>
                 <button
-                  onClick={() => setTabMode("classificacao")}
+                  onClick={() => setTabMode("playoffs")}
                   className={`tab-button ${
-                    tabMode === "classificacao" ? "active" : ""
+                    tabMode === "playoffs" ? "active" : ""
                   }`}
                 >
-                  Classificação
+                  Playoffs
                 </button>
                 <button
-                  onClick={() => setTabMode("artilharia")}
+                  onClick={() => setTabMode("chaveamento")}
                   className={`tab-button ${
-                    tabMode === "artilharia" ? "active" : ""
+                    tabMode === "chaveamento" ? "active" : ""
                   }`}
                 >
-                  Artilharia
+                  Eliminatórias
                 </button>
                 <button
                   onClick={() => {
@@ -273,6 +279,118 @@ export default function BrasileiraoPage() {
               </div>
             </div>
 
+            {tabMode === "probabilidades" && (
+              <div className="grid grid-cols-1 gap-8 mb-8">
+                <ChampionshipChart
+                  data={chartData}
+                  title="Probabilidade de Título (%)"
+                  colors={chartColors}
+                  isLoading={isLoading}
+                />
+
+                <MonteCarloExplainer
+                  isLoading={isLoading}
+                  simulationCount={numSimulacoes}
+                  currentSimulation={currentSimulation}
+                  results={resultado}
+                />
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="card overflow-x-auto"
+                >
+                  <h3 className="text-xl font-bold mb-4">
+                    Probabilidades Completas
+                  </h3>
+
+                  <table className="min-w-full divide-y divide-gray-700">
+                    <thead>
+                      <tr>
+                        <th className="py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                          #
+                        </th>
+                        <th className="py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                          Time
+                        </th>
+                        <th className="py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                          Força
+                        </th>
+                        <th className="py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                          Títulos
+                        </th>
+                        <th className="py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                          Top 8
+                        </th>
+                        <th className="py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                          Eliminação
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-800">
+                      {resultado.times.map((time, index) => (
+                        <tr
+                          key={time.id}
+                          className={
+                            index < 8
+                              ? "bg-green-900/20"
+                              : index >= resultado.times.length - 8
+                              ? "bg-red-900/20"
+                              : ""
+                          }
+                        >
+                          <td className="py-2 text-sm">{index + 1}</td>
+                          <td className="py-2 text-sm">
+                            <div className="flex items-center">
+                              <div className="w-6 h-6 mr-2 relative">
+                                <TeamLogo team={time} size={24} />
+                              </div>
+                              {time.nome}
+                            </div>
+                          </td>
+                          <td className="py-2 text-sm text-center">
+                            {time.forca}
+                          </td>
+                          <td className="py-2 text-sm text-center font-bold text-green-500">
+                            {time.titulos} (
+                            {time.probabilidadeTitulo.toFixed(1)}%)
+                          </td>
+                          <td className="py-2 text-sm text-center">
+                            {time.top8} ({time.probabilidadeTop8.toFixed(1)}%)
+                          </td>
+                          <td className="py-2 text-sm text-center font-bold text-red-500">
+                            {time.eliminadoLiga} (
+                            {time.probabilidadeEliminacao.toFixed(1)}%)
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </motion.div>
+              </div>
+            )}
+
+            {tabMode === "fase-liga" && (
+              <ChampionsLigaTable
+                classificacao={
+                  resultado.simulacaoDetalhada.faseLiga.classificacao
+                }
+              />
+            )}
+
+            {tabMode === "playoffs" && (
+              <ChampionsPlayoffBracket
+                confrontos={resultado.simulacaoDetalhada.playoff.confrontos}
+              />
+            )}
+
+            {tabMode === "chaveamento" && (
+              <ChampionsBracket
+                chaveamento={resultado.simulacaoDetalhada.faseEliminatoria}
+              />
+            )}
+
             {tabMode === "monte-carlo" && (
               <div className="grid grid-cols-1 gap-8 mb-8">
                 <motion.div
@@ -286,23 +404,23 @@ export default function BrasileiraoPage() {
                     </h3>
                     <p className="mb-4">
                       Esta visualização mostra como o método Monte Carlo é
-                      aplicado para simular os resultados do Brasileirão. Cada
-                      simulação gera resultados aleatórios baseados nas forças
-                      dos times, permitindo calcular probabilidades reais após
-                      milhares de iterações.
+                      aplicado para simular os resultados da Champions League.
+                      Cada simulação gera milhares de resultados aleatórios
+                      baseados nas forças dos times, permitindo calcular
+                      probabilidades reais.
                     </p>
 
                     <div className="bg-blue-900/20 p-4 rounded-lg mb-4">
                       <h4 className="font-semibold mb-2">Como funciona:</h4>
                       <ol className="list-decimal list-inside space-y-2">
                         <li>
-                          <strong>Simulação de partidas</strong>: Cada partida
-                          do campeonato é simulada usando probabilidades
-                          baseadas na força dos times
+                          <strong>Simulação de partidas</strong>: Cada partida é
+                          simulada usando probabilidades baseadas na força dos
+                          times
                         </li>
                         <li>
-                          <strong>Simulação completa</strong>: Todo o campeonato
-                          é simulado do início ao fim
+                          <strong>Simulação completa</strong>: Todo o torneio é
+                          simulado do início ao fim
                         </li>
                         <li>
                           <strong>Repetição</strong>: O processo é repetido
@@ -310,8 +428,7 @@ export default function BrasileiraoPage() {
                         </li>
                         <li>
                           <strong>Estatísticas</strong>: Os resultados são
-                          agregados para calcular probabilidades de título, G4,
-                          rebaixamento, etc.
+                          agregados para calcular probabilidades
                         </li>
                       </ol>
                     </div>
@@ -342,116 +459,6 @@ export default function BrasileiraoPage() {
                   />
                 </motion.div>
               </div>
-            )}
-
-            {tabMode === "probabilidades" && (
-              <div className="grid grid-cols-1 gap-8 mb-8">
-                <ChampionshipChart
-                  data={chartData}
-                  title="Probabilidade de Título (%)"
-                  colors={chartColors}
-                  isLoading={isLoading}
-                />
-
-                <MonteCarloExplainer
-                  isLoading={isLoading}
-                  simulationCount={numSimulacoes}
-                  currentSimulation={currentSimulation}
-                  results={resultado}
-                />
-
-                {showTable && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="card overflow-x-auto"
-                  >
-                    <h3 className="text-xl font-bold mb-4">
-                      Probabilidades Completas
-                    </h3>
-
-                    <table className="min-w-full divide-y divide-gray-700">
-                      <thead>
-                        <tr>
-                          <th className="py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                            #
-                          </th>
-                          <th className="py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                            Time
-                          </th>
-                          <th className="py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
-                            Força
-                          </th>
-                          <th className="py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
-                            Títulos
-                          </th>
-                          <th className="py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
-                            G4
-                          </th>
-                          <th className="py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
-                            Z4
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-800">
-                        {resultado.times.map((time, index) => (
-                          <tr
-                            key={time.id}
-                            className={
-                              index < 4
-                                ? "bg-green-900/20"
-                                : index >= resultado.times.length - 4
-                                ? "bg-red-900/20"
-                                : ""
-                            }
-                          >
-                            <td className="py-2 text-sm">{index + 1}</td>
-                            <td className="py-2 text-sm">
-                              <div className="flex items-center">
-                                <div className="w-6 h-6 mr-2 relative">
-                                  <TeamLogo team={time} size={24} />
-                                </div>
-                                {time.nome}
-                              </div>
-                            </td>
-                            <td className="py-2 text-sm text-right">
-                              {time.forca}
-                            </td>
-                            <td className="py-2 text-sm text-right font-bold text-green-500">
-                              {time.titulos} (
-                              {time.probabilidadeTitulo.toFixed(1)}%)
-                            </td>
-                            <td className="py-2 text-sm text-right">
-                              {time.g4} ({time.probabilidadeG4.toFixed(1)}%)
-                            </td>
-                            <td className="py-2 text-sm text-right font-bold text-red-500">
-                              {time.rebaixamentos} (
-                              {time.probabilidadeRebaixamento.toFixed(1)}%)
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </motion.div>
-                )}
-              </div>
-            )}
-
-            {tabMode === "jogos" && (
-              <MatchTable rodadas={resultado.simulacaoDetalhada.rodadas} />
-            )}
-
-            {tabMode === "classificacao" && (
-              <LeagueTable
-                classificacao={resultado.simulacaoDetalhada.classificacao}
-              />
-            )}
-
-            {tabMode === "artilharia" && (
-              <TopScorers
-                artilheiros={resultado.simulacaoDetalhada.artilheiros}
-              />
             )}
           </motion.div>
         )}
