@@ -31,13 +31,37 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">
-            Simulador de Campeonatos
+          <h1 className="md:text-5xl font-bold text-center bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+            Simulador de Campeonatos com Monte Carlo
           </h1>
-          <p className="text-lg text-gray-300 text-center max-w-3xl mx-auto">
-            Utilizando o método de Monte Carlo para simular campeonatos de
-            futebol e calcular probabilidades
-          </p>
+        </motion.div>
+
+        <motion.div
+          className="mt-16 card bg-opacity-70"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+        >
+          <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+            Desenvolvido por
+          </h2>
+          <div className="flex items-center justify-center gap-10">
+            <p className="text-white font-bold text-center text-2xl">
+              ARTHUR HENRIQUE TSCHA VIEIRA
+            </p>
+            <p className="text-white font-bold text-center text-2xl">
+              GUSTAVO HENRIQUE COSTA
+            </p>
+            <p className="text-white font-bold text-center text-2xl">
+              LUCAS MENDES ISRAEL
+            </p>
+            <p className="text-white font-bold text-center text-2xl">
+              MARCO LEONE MERINI
+            </p>
+            <p className="text-white font-bold text-center text-2xl">
+              RAFAEL RODRIGUES FERREIRA DE ANDRADE
+            </p>
+          </div>
         </motion.div>
 
         <motion.div
@@ -174,25 +198,6 @@ export default function Home() {
               </div>
             </Link>
           </motion.div>
-        </motion.div>
-
-        <motion.div
-          className="mt-16 card"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.9 }}
-        >
-          <h2 className="text-2xl font-bold mb-4">
-            <span className="soccer-ball-icon"></span>
-            Sobre o Simulador
-          </h2>
-          <p className="text-gray-300 mb-4">
-            Este simulador utiliza o <strong>método de Monte Carlo</strong> para
-            calcular as probabilidades de cada time em um campeonato. O método
-            consiste em realizar milhares de simulações aleatórias do
-            campeonato, e então contabilizar os resultados para determinar as
-            probabilidades.
-          </p>
         </motion.div>
       </div>
     </main>

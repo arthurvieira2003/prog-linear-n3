@@ -32,6 +32,13 @@ export default function ChampionsPlayoffBracket({ confrontos }) {
               : "linear-gradient(90deg, rgba(239, 68, 68, 0.2) 0%, transparent 100%)",
           };
 
+          // Verificar se houve empate no agregado
+          const golsTotalMandante =
+            confronto.golsMandanteIda + confronto.golsVisitanteVolta;
+          const golsTotalVisitante =
+            confronto.golsVisitanteIda + confronto.golsMandanteVolta;
+          const houveEmpateAgregado = golsTotalMandante === golsTotalVisitante;
+
           return (
             <div
               key={confronto.id}
@@ -53,9 +60,11 @@ export default function ChampionsPlayoffBracket({ confrontos }) {
 
                 {/* Jogo de ida */}
                 <div className="mb-4 border-b border-gray-700 pb-3">
-                  <div className="text-xs text-gray-400 mb-2">Jogo de ida</div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
+                  <div className="text-xs text-gray-400 mb-2 text-center">
+                    Jogo de ida
+                  </div>
+                  <div className="grid grid-cols-3 items-center">
+                    <div className="flex items-center justify-start">
                       <div className="w-6 h-6 relative mr-2">
                         <TeamLogo team={confronto.mandante} size={24} />
                       </div>
@@ -63,12 +72,12 @@ export default function ChampionsPlayoffBracket({ confrontos }) {
                         {confronto.mandante.nome}
                       </span>
                     </div>
-                    <div className="flex items-center font-bold">
+                    <div className="flex items-center justify-center font-bold">
                       <span>{confronto.golsMandanteIda}</span>
                       <span className="mx-1">-</span>
                       <span>{confronto.golsVisitanteIda}</span>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-center justify-end">
                       <span className="text-sm font-medium">
                         {confronto.visitante.nome}
                       </span>
@@ -81,11 +90,11 @@ export default function ChampionsPlayoffBracket({ confrontos }) {
 
                 {/* Jogo de volta */}
                 <div className="mb-4 border-b border-gray-700 pb-3">
-                  <div className="text-xs text-gray-400 mb-2">
+                  <div className="text-xs text-gray-400 mb-2 text-center">
                     Jogo de volta
                   </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
+                  <div className="grid grid-cols-3 items-center">
+                    <div className="flex items-center justify-start">
                       <div className="w-6 h-6 relative mr-2">
                         <TeamLogo team={confronto.visitante} size={24} />
                       </div>
@@ -93,12 +102,12 @@ export default function ChampionsPlayoffBracket({ confrontos }) {
                         {confronto.visitante.nome}
                       </span>
                     </div>
-                    <div className="flex items-center font-bold">
+                    <div className="flex items-center justify-center font-bold">
                       <span>{confronto.golsMandanteVolta}</span>
                       <span className="mx-1">-</span>
                       <span>{confronto.golsVisitanteVolta}</span>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-center justify-end">
                       <span className="text-sm font-medium">
                         {confronto.mandante.nome}
                       </span>
@@ -109,13 +118,14 @@ export default function ChampionsPlayoffBracket({ confrontos }) {
                   </div>
                 </div>
 
-                {/* Placar agregado */}
-                <div className="text-center mb-4 flex justify-center">
-                  <div className="bg-gray-900/90 rounded-md px-4 py-2 border border-gray-700">
-                    <span className="text-xs text-gray-400">
-                      Placar agregado:{" "}
-                    </span>
-                    <div className="flex items-center">
+                {/* Área de resumo: Placar agregado e Classificado */}
+                <div className="grid grid-cols-2 gap-2 mt-4">
+                  {/* Placar agregado */}
+                  <div className="bg-gray-900/90 rounded-md px-3 py-2 border border-gray-700 flex flex-col justify-center">
+                    <div className="text-xs text-gray-400 text-center mb-1">
+                      Placar agregado
+                    </div>
+                    <div className="flex items-center justify-center">
                       <div className="flex items-center mr-1">
                         <div className="w-4 h-4 relative mr-1">
                           <TeamLogo team={confronto.mandante} size={16} />
@@ -148,41 +158,27 @@ export default function ChampionsPlayoffBracket({ confrontos }) {
                         </div>
                       </div>
                     </div>
-                    {confronto.penaltis && (
-                      <div className="text-gray-400 text-xs mt-1">
+                    {houveEmpateAgregado && confronto.penaltis && (
+                      <div className="text-gray-400 text-xs mt-1 text-center">
                         Pênaltis: {confronto.penaltis[0]} -{" "}
                         {confronto.penaltis[1]}
                       </div>
                     )}
                   </div>
-                </div>
 
-                {/* Exibir os gols de cada time para verificação */}
-                <div className="text-center mb-3 text-xs text-gray-400">
-                  <div>
-                    <span>
-                      {confronto.mandante.nome}: {confronto.golsMandanteIda}{" "}
-                      (ida) + {confronto.golsVisitanteVolta} (volta)
-                    </span>
-                  </div>
-                  <div>
-                    <span>
-                      {confronto.visitante.nome}: {confronto.golsVisitanteIda}{" "}
-                      (ida) + {confronto.golsMandanteVolta} (volta)
-                    </span>
-                  </div>
-                </div>
-
-                {/* Classificado */}
-                <div className="text-center bg-gray-900/50 py-2 rounded-md border border-gray-700 mt-4">
-                  <div className="text-xs text-gray-400 mb-1">Classificado</div>
-                  <div className="flex justify-center items-center">
-                    <div className="w-6 h-6 relative mr-2">
-                      <TeamLogo team={confronto.vencedor} size={24} />
+                  {/* Classificado */}
+                  <div className="bg-gray-900/50 rounded-md px-3 py-2 border border-gray-700 flex flex-col justify-center">
+                    <div className="text-xs text-gray-400 text-center mb-1">
+                      Classificado
                     </div>
-                    <span className="font-bold text-green-500">
-                      {confronto.vencedor.nome}
-                    </span>
+                    <div className="flex justify-center items-center">
+                      <div className="w-6 h-6 relative mr-2">
+                        <TeamLogo team={confronto.vencedor} size={24} />
+                      </div>
+                      <span className="font-bold text-green-500">
+                        {confronto.vencedor.nome}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

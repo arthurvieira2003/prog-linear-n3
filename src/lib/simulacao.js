@@ -1497,6 +1497,13 @@ function simularPlayoffChampions(times) {
         Math.floor(Math.random() * 3) + 3,
       ];
 
+      // Garantir que não haja empate nos pênaltis
+      if (penaltis[0] === penaltis[1]) {
+        // Adicionar um gol aleatoriamente para um dos times
+        const randomTime = Math.random() < 0.5 ? 0 : 1;
+        penaltis[randomTime] += 1;
+      }
+
       confronto.penaltis = penaltis;
       confronto.vencedor =
         penaltis[0] > penaltis[1] ? confronto.mandante : confronto.visitante;
@@ -1564,6 +1571,13 @@ function simularFasesEliminatoriasChampions(times) {
         Math.floor(Math.random() * 3) + 3,
       ];
 
+      // Garantir que não haja empate nos pênaltis
+      if (penaltis[0] === penaltis[1]) {
+        // Adicionar um gol aleatoriamente para um dos times
+        const randomTime = Math.random() < 0.5 ? 0 : 1;
+        penaltis[randomTime] += 1;
+      }
+
       vencedor =
         penaltis[0] > penaltis[1] ? confronto.mandante : confronto.visitante;
     }
@@ -1629,6 +1643,13 @@ function simularFasesEliminatoriasChampions(times) {
         Math.floor(Math.random() * 3) + 3, // Entre 3 e 5 gols
         Math.floor(Math.random() * 3) + 3,
       ];
+
+      // Garantir que não haja empate nos pênaltis
+      if (penaltis[0] === penaltis[1]) {
+        // Adicionar um gol aleatoriamente para um dos times
+        const randomTime = Math.random() < 0.5 ? 0 : 1;
+        penaltis[randomTime] += 1;
+      }
 
       vencedor =
         penaltis[0] > penaltis[1] ? confronto.mandante : confronto.visitante;
@@ -1704,6 +1725,13 @@ function simularFasesEliminatoriasChampions(times) {
         Math.floor(Math.random() * 3) + 3,
       ];
 
+      // Garantir que não haja empate nos pênaltis
+      if (penaltis[0] === penaltis[1]) {
+        // Adicionar um gol aleatoriamente para um dos times
+        const randomTime = Math.random() < 0.5 ? 0 : 1;
+        penaltis[randomTime] += 1;
+      }
+
       if (penaltis[0] > penaltis[1]) {
         vencedor = confronto.mandante;
         perdedor = confronto.visitante;
@@ -1757,6 +1785,13 @@ function simularFasesEliminatoriasChampions(times) {
       Math.floor(Math.random() * 3) + 3, // Entre 3 e 5 gols
       Math.floor(Math.random() * 3) + 3,
     ];
+
+    // Garantir que não haja empate nos pênaltis
+    if (penaltis[0] === penaltis[1]) {
+      // Adicionar um gol aleatoriamente para um dos times
+      const randomTime = Math.random() < 0.5 ? 0 : 1;
+      penaltis[randomTime] += 1;
+    }
 
     if (penaltis[0] > penaltis[1]) {
       vencedor = confrontoFinal.mandante;
